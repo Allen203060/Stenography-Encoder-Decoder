@@ -1,0 +1,41 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.o
+*.obj
+obj/
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lib
+*.a
+
+# Executables
+*.exe
+*.out
+*.app
+a.out
+steg
+
+# Concept Demo Executables
+concepts/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE / Editor folders
+.vscode/
+.idea/
+*.swp
+*~
