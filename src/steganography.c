@@ -1,5 +1,70 @@
 #include "../include/steganography.h"
 #include <string.h>
+#include <pthread.h>
+
+struct thread_data {
+    unsigned char *pixel_chunk;  
+    const char *msg_chunk;       
+    size_t length;               
+    int is_last;                 
+};
+
+void *encode_worker(void *arg) {
+    // casting the generic void pointer back to our struct pointer
+    struct thread_data *data = (struct thread_data *)arg;
+
+    
+    for (size_t i = 0; i < data->length; i++) {
+        encode_char(data->pixel_chunk + i * 8, data->msg_chunk[i]);
+    }
+
+    if (data->is_last) {
+        encode_char(data->pixel_chunk + data->length * 8, '\0');
+    }
+
+    return NULL;  
+}
+
+void encode_string_multithreaded(unsigned char *pixel_array, const char *message, int num_threads) {
+    size_t len = strlen(message);
+    if (len == 0) {
+        encode_char(pixel_array, '\0');
+        return;
+    }
+
+    // spawn less threads than the number of characters
+    if (num_threads > (int)len) {
+        num_threads = len;
+    }
+    if (num_threads <= 0) {
+        num_threads = 1;
+    }
+
+    pthread_t threads[num_threads];
+    struct thread_data args[num_threads];
+
+    size_t chunk_size = len / num_threads;
+    size_t remainder = len % num_threads;
+    size_t current_msg_offset = 0;
+ 
+    for (int i = 0; i < num_threads; i++) {
+        size_t thread_len = chunk_size + (i < (int)remainder ? 1 : 0);
+
+        args[i].msg_chunk = message + current_msg_offset;
+        args[i].pixel_chunk = pixel_array + (current_msg_offset * 8);
+        args[i].length = thread_len;
+        args[i].is_last = (i == num_threads - 1);
+
+        pthread_create(&threads[i], NULL, encode_worker, &args[i]);
+
+        current_msg_offset += thread_len;
+    }
+
+    for (int i = 0; i < num_threads; i++) {
+        pthread_join(threads[i], NULL);
+    }
+}
+
 
 
 void encode_char(unsigned char *pixel_array, char secret) {

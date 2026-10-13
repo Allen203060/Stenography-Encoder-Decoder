@@ -6,5 +6,6 @@ void encode_string(unsigned char *pixel_array, const char *message);
 
 char decode_char(unsigned char *pixel_array);
 void decode_string(unsigned char *pixel_array, char *message);
+void encode_string_multithreaded(unsigned char *pixel_array, const char *message, int num_threads);
 
 #endif
